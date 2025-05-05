@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Schedule - University ERP</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5 url('static/images/background.jpg') no-repeat center center/cover;
+      min-height: 100vh;
+    }
+
+    nav {
+      background-color: #007bff;
+      padding: 10px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    nav a:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .schedule-container {
+      background-color: white;
+      width: 90%;
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .header {
+      background-color: #007bff;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 26px;
+      font-weight: bold;
+      border-radius: 10px 10px 0 0;
+    }
+
+    .search-bar {
+      margin: 20px 0;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .search-bar input,
+    .search-bar select {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 48%;
+    }
+
+    .search-bar button {
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .search-bar button:hover {
+      background-color: #218838;
+    }
+
+    .schedule-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .schedule-table th,
+    .schedule-table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .schedule-table th {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .schedule-table td span.tag {
+      padding: 3px 7px;
+      font-size: 12px;
+      border-radius: 4px;
+      color: white;
+    }
+
+    .tag-exam {
+      background-color: #dc3545;
+    }
+
+    .tag-event {
+      background-color: #17a2b8;
+    }
+
+    .tag-lecture {
+      background-color: #ffc107;
+      color: black;
+    }
+
+    .image-section {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .image-section img {
+      width: 32%;
+      border-radius: 8px;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+
+    .image-section img:hover {
+      transform: scale(1.05);
+    }
+
+    /* Lightbox Styles */
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .lightbox img {
+      max-width: 90%;
+      max-height: 90%;
+    }
+
+    @media (max-width: 768px) {
+      .search-bar input,
+      .search-bar select {
+        width: 100%;
+      }
+
+      .image-section img {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav>
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('login') }}">Login</a>
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('attendance') }}">Attendance</a>
+    <a href="{{ url_for('grades') }}">Grades</a>
+    <a href="{{ url_for('schedule') }}">Schedule</a>
+    <a href="{{ url_for('notice') }}">Notice</a>
+    <a href="{{ url_for('messaging') }}">Messaging</a>
+    <a href="{{ url_for('contact') }}">Contact</a>
+    <a href="{{ url_for('about') }}">About</a>
+  </nav>
+
+  <div class="schedule-container">
+    <div class="header">University Schedule</div>
+
+    <!-- Search and Filter -->
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Search by Event, Date, or Location" onkeyup="filterSchedule()" />
+      <select id="event-filter" onchange="filterSchedule()">
+        <option value="">All Event Types</option>
+        <option value="Exam">Exam</option>
+        <option value="Event">Event</option>
+        <option value="Lecture">Lecture</option>
+      </select>
+      <select id="date-filter" onchange="filterSchedule()">
+        <option value="">All Dates</option>
+        <option value="15th May 2025">15th May 2025</option>
+        <option value="20th May 2025">20th May 2025</option>
+        <option value="25th May 2025">25th May 2025</option>
+        <option value="1st June 2025">1st June 2025</option>
+        <option value="5th June 2025">5th June 2025</option>
+      </select>
+      <button onclick="downloadPDF()">Export PDF</button>
+    </div>
+
+    <!-- Schedule Table -->
+    <table class="schedule-table" id="schedule-table">
+      <thead>
+        <tr>
+          <th>Event</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Location</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Mid Semester Exam <span class="tag tag-exam">Exam</span></td>
+          <td>15th May 2025</td>
+          <td>10:00 AM</td>
+          <td>Room 101</td>
+        </tr>
+        <tr>
+          <td>University Sports Meet <span class="tag tag-event">Event</span></td>
+          <td>20th May 2025</td>
+          <td>9:00 AM</td>
+          <td>Sports Complex</td>
+        </tr>
+        <tr>
+          <td>Guest Lecture on AI <span class="tag tag-lecture">Lecture</span></td>
+          <td>25th May 2025</td>
+          <td>2:00 PM</td>
+          <td>Main Auditorium</td>
+        </tr>
+        <tr>
+          <td>University Graduation <span class="tag tag-event">Event</span></td>
+          <td>1st June 2025</td>
+          <td>10:00 AM</td>
+          <td>Graduation Hall</td>
+        </tr>
+        <tr>
+          <td>Orientation Program <span class="tag tag-lecture">Lecture</span></td>
+          <td>5th June 2025</td>
+          <td>11:00 AM</td>
+          <td>Room 102</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Image Gallery -->
+    <div class="image-section">
+      <img src="static/images/image1.jpg" alt="Event Image 1" onclick="openLightbox(this)" />
+      <img src="static/images/image2.jpg" alt="Event Image 2" onclick="openLightbox(this)" />
+      <img src="static/images/image3.jpg" alt="Event Image 3" onclick="openLightbox(this)" />
+    </div>
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="Full Image" />
+  </div>
+
+  <!-- JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    function filterSchedule() {
+      const input = document.getElementById("search-input").value.toLowerCase();
+      const selectedEvent = document.getElementById("event-filter").value;
+      const selectedDate = document.getElementById("date-filter").value;
+      const rows = document.querySelectorAll("#schedule-table tbody tr");
+
+      rows.forEach((row) => {
+        const cells = row.querySelectorAll("td");
+        const rowText = Array.from(cells).map(td => td.textContent.toLowerCase()).join(" ");
+        const dateText = cells[1].textContent;
+        const eventType = cells[0].querySelector(".tag").textContent;
+
+        const matchesSearch = rowText.includes(input);
+        const matchesDate = !selectedDate || dateText === selectedDate;
+        const matchesEvent = !selectedEvent || eventType === selectedEvent;
+
+        row.style.display = matchesSearch && matchesDate && matchesEvent ? "" : "none";
+      });
+    }
+
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text("University Schedule", 20, 20);
+      doc.autoTable({ html: '#schedule-table', startY: 30 });
+      doc.save("schedule.pdf");
+    }
+
+    function openLightbox(imgElement) {
+      const lightbox = document.getElementById("lightbox");
+      const lightboxImg = document.getElementById("lightbox-img");
+      lightboxImg.src = imgElement.src;
+      lightbox.style.display = "flex";
+    }
+
+    function closeLightbox() {
+      document.getElementById("lightbox").style.display = "none";
+    }
+  </script>
+</body>
+
+</html>

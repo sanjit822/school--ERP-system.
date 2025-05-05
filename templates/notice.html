@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notice Board - University ERP</title>
+  <style>
+    /* Basic Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-image: url('static/images/background.jpg');
+      background-size: cover;
+      background-position: center;
+    }
+
+    .notice-container {
+      background-color: white;
+      width: 80%;
+      max-width: 900px;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Header */
+    .notice-header {
+      background-color: #007bff;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 24px;
+      border-radius: 10px 10px 0 0;
+    }
+
+    /* Search Section */
+    .search-section {
+      margin-top: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .search-section input {
+      padding: 8px;
+      width: 70%;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .search-section button {
+      padding: 8px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .search-section button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Notice Section */
+    .notice-list {
+      margin-top: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 10px;
+    }
+
+    .notice-item {
+      background-color: #f1f1f1;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 0.3s;
+    }
+
+    .notice-item:hover {
+      background-color: #e9ecef;
+    }
+
+    .notice-item h3 {
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: #333;
+    }
+
+    .notice-item p {
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    .notice-item span {
+      font-size: 12px;
+      color: #888;
+    }
+
+    /* Add Notice Section */
+    .add-notice {
+      display: flex;
+      flex-direction: column;
+      margin-top: 20px;
+    }
+
+    .add-notice textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    .add-notice button {
+      padding: 10px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .add-notice button:hover {
+      background-color: #218838;
+    }
+
+    .image-section {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .image-section img {
+      width: 30%;
+      border-radius: 5px;
+    }
+
+    /* Notification section */
+    .notification {
+      background-color: #28a745;
+      color: white;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      display: none;
+    }
+
+    /* Pagination */
+    .load-more-btn {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .load-more-btn:hover {
+      background-color: #0056b3;
+    }
+
+  </style>
+</head>
+
+<body>
+  <nav>
+    <div class="container">
+      <a href="{{ url_for('index') }}">ERP System</a>
+      <a href="{{ url_for('login') }}">Login</a>
+      <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('attendance') }}">Attendance</a>
+      <a href="{{ url_for('grades') }}">Grades</a>
+      <a href="{{ url_for('schedule') }}">Schedule</a>
+      <a href="{{ url_for('notice') }}">Notice</a>
+      <a href="{{ url_for('messaging') }}">Messaging</a>
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('contact') }}">Contact</a>
+      <a href="{{ url_for('about') }}">About</a>
+    </div>
+  </nav>
+  
+  <div class="notice-container">
+    <!-- Notification -->
+    <div class="notification" id="notification">
+      New notice added!
+    </div>
+
+    <!-- Header -->
+    <div class="notice-header">
+      <span>Notice Board</span>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-section">
+      <input type="text" id="search-input" placeholder="Search notices...">
+      <button onclick="searchNotices()">Search</button>
+    </div>
+
+    <!-- Notice List -->
+    <div class="notice-list" id="notice-list">
+      <!-- Notices will load dynamically -->
+    </div>
+
+    <!-- Load More Notices Button -->
+    <button class="load-more-btn" onclick="loadMoreNotices()">Load More</button>
+
+    <!-- Add New Notice Section -->
+    <div class="add-notice">
+      <textarea id="new-notice" rows="4" placeholder="Write a new notice..."></textarea>
+      <button onclick="addNotice()">Add Notice</button>
+    </div>
+
+    <!-- Image Section -->
+    <div class="image-section">
+      <img src="static/images/image1.jpg" alt="Image 1">
+      <img src="static/images/image2.jpg" alt="Image 2">
+      <img src="static/images/image3.jpg" alt="Image 3">
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    let noticeCounter = 0;
+
+    // Add notice function
+    function addNotice() {
+      var newNoticeText = document.getElementById('new-notice').value.trim();
+      if (newNoticeText !== "") {
+        var currentDate = new Date().toLocaleDateString();
+
+        // Create new notice item
+        var noticeItem = document.createElement('div');
+        noticeItem.classList.add('notice-item');
+
+        var noticeTitle = document.createElement('h3');
+        noticeTitle.textContent = "New Notice " + (noticeCounter + 1);
+        var noticeContent = document.createElement('p');
+        noticeContent.textContent = newNoticeText;
+        var noticeDate = document.createElement('span');
+        noticeDate.textContent = "Posted on: " + currentDate;
+
+        noticeItem.appendChild(noticeTitle);
+        noticeItem.appendChild(noticeContent);
+        noticeItem.appendChild(noticeDate);
+
+        // Add to the notice list
+        document.getElementById('notice-list').prepend(noticeItem);
+
+        // Show notification
+        showNotification();
+
+        // Clear the textarea
+        document.getElementById('new-notice').value = '';
+        noticeCounter++;
+      }
+    }
+
+    // Show notification
+    function showNotification() {
+      var notification = document.getElementById('notification');
+      notification.style.display = 'block';
+      setTimeout(function () {
+        notification.style.display = 'none';
+      }, 3000);
+    }
+
+    // Search function
+    function searchNotices() {
+      var searchInput = document.getElementById('search-input').value.toLowerCase();
+      var noticeItems = document.querySelectorAll('.notice-item');
+
+      noticeItems.forEach(function (notice) {
+        var noticeText = notice.querySelector('h3').textContent.toLowerCase() + ' ' + notice.querySelector('p').textContent.toLowerCase();
+
+        if (noticeText.includes(searchInput)) {
+          notice.style.display = 'block';
+        } else {
+          notice.style.display = 'none';
+        }
+      });
+    }
+
+    // Load more notices dynamically
+    function loadMoreNotices() {
+      const noticeList = document.getElementById('notice-list');
+      for (let i = 0; i < 5; i++) {
+        var noticeItem = document.createElement('div');
+        noticeItem.classList.add('notice-item');
+        noticeItem.innerHTML = `
+          <h3>Notice ${noticeCounter + 1}</h3>
+          <p>Notice content goes here...</p>
+          <span>Posted on: ${new Date().toLocaleDateString()}</span>
+        `;
+        noticeList.appendChild(noticeItem);
+        noticeCounter++;
+      }
+    }
+  </script>
+</body>
+
+</html>

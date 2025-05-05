@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ERP Home</title>
+  <style>
+    /* General Reset */
+    body, h1, h2, h3, p, ul, li, a {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Navbar */
+    nav {
+      background-color: #343a40;
+      color: white;
+      padding: 10px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    /* Hero Section */
+    header {
+      background-color: #007bff;
+      color: white;
+      text-align: center;
+      padding: 60px 0;
+    }
+
+    header h1 {
+      font-size: 3em;
+      font-weight: bold;
+    }
+
+    header p {
+      font-size: 1.2em;
+    }
+
+    /* Image Slider */
+    .carousel {
+      max-width: 100%;
+      margin: 0 auto;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .carousel-inner {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    .carousel-item {
+      min-width: 100%;
+    }
+
+    .carousel-inner img {
+      width: 100%;
+      height: auto;
+    }
+
+    .carousel-control-prev, .carousel-control-next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: rgba(0, 0, 0, 0.5);
+      border: none;
+      padding: 10px;
+      z-index: 1000;
+    }
+
+    .carousel-control-prev {
+      left: 10px;
+    }
+
+    .carousel-control-next {
+      right: 10px;
+    }
+
+    /* Interactive Features Section */
+    .feature-cards {
+      display: flex;
+      justify-content: space-around;
+      margin: 40px 0;
+    }
+
+    .card {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 20px;
+      width: 20%;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .card h3 {
+      margin-bottom: 20px;
+    }
+
+    /* Notification */
+    .notification {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 10px;
+      border-radius: 5px;
+      display: none;
+      z-index: 1000;
+    }
+
+    .notification button {
+      background: none;
+      border: none;
+      color: #721c24;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 0;
+      margin-left: 10px;
+    }
+
+    /* Footer */
+    footer {
+      background-color: #343a40;
+      color: white;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .container {
+      width: 80%;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      width: 400px;
+      text-align: center;
+    }
+
+    .modal button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+
+    .modal button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav>
+    <div class="container">
+      <a href="{{ url_for('index') }}">ERP System</a>
+      <a href="{{ url_for('login') }}">Login</a>
+      <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('attendance') }}">Attendance</a>
+      <a href="{{ url_for('grades') }}">Grades</a>
+      <a href="{{ url_for('schedule') }}">Schedule</a>
+      <a href="{{ url_for('notice') }}">Notice</a>
+      <a href="{{ url_for('messaging') }}">Messaging</a>
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('contact') }}">Contact</a>
+      <a href="{{ url_for('about') }}">About</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header>
+    <h1>Welcome to University ERP</h1>
+    <p>Manage Students, Teachers, Classes & More</p>
+  </header>
+
+  <!-- Image Slider Section -->
+  <div id="imageCarousel" class="carousel my-5">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img src="static/images/image1.jpg" alt="Image 1">
+      </div>
+      <div class="carousel-item">
+        <img src="static/images/image2.jpg" alt="Image 2">
+      </div>
+      <div class="carousel-item">
+        <img src="static/images/image3.jpg" alt="Image 3">
+      </div>
+      <div class="carousel-item">
+        <img src="static/images/image4.jpg" alt="Image 4">
+      </div>
+      <div class="carousel-item">
+        <img src="static/images/image5.jpg" alt="Image 5">
+      </div>
+    </div>
+    <button class="carousel-control-prev" onclick="prevSlide()">Prev</button>
+    <button class="carousel-control-next" onclick="nextSlide()">Next</button>
+  </div>
+
+  <!-- Interactive Features Section -->
+  <div class="container">
+    <h2>Explore ERP Features</h2>
+    <div class="feature-cards">
+      <div class="card">
+        <h3>Attendance</h3>
+        <p>Track attendance for all students in real-time.</p>
+      </div>
+      <div class="card">
+        <h3>Grades</h3>
+        <p>Access and update student grades efficiently.</p>
+      </div>
+      <div class="card">
+        <h3>Schedule</h3>
+        <p>View and manage class schedules easily.</p>
+      </div>
+      <div class="card">
+        <h3>Notice</h3>
+        <p>View important notices for students and staff.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Section -->
+  <div class="notification" id="notification">
+    <p>This is an important notification for the students and faculty!</p>
+    <button onclick="closeNotification()">Close</button>
+  </div>
+
+  <!-- About ERP -->
+  <div class="container">
+    <h2>About the ERP System</h2>
+    <p>This ERP system allows seamless management of students, teachers, courses, and more. Stay connected and updated!</p>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 University ERP System</p>
+    <ul>
+      <li><a href="#">Privacy Policy</a></li>
+      <li><a href="#">Terms of Service</a></li>
+      <li><a href="#">Help</a></li>
+    </ul>
+  </footer>
+
+  <!-- Modal -->
+  <div id="welcomeModal" class="modal">
+    <div class="modal-content">
+      <h2>Welcome to the ERP System!</h2>
+      <p>We hope you enjoy using this platform. Let us know if you need any assistance.</p>
+      <button onclick="closeModal()">Got it!</button>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    let currentSlide = 0;
+
+    // Function to go to the next slide
+    function nextSlide() {
+      const slides = document.querySelectorAll('.carousel-item');
+      if (currentSlide < slides.length - 1) {
+        currentSlide++;
+      } else {
+        currentSlide = 0;
+      }
+      updateCarousel();
+    }
+
+    // Function to go to the previous slide
+    function prevSlide() {
+      const slides = document.querySelectorAll('.carousel-item');
+      if (currentSlide > 0) {
+        currentSlide--;
+      } else {
+        currentSlide = slides.length - 1;
+      }
+      updateCarousel();
+    }
+
+    // Update the carousel view
+    function updateCarousel() {
+      const slides = document.querySelectorAll('.carousel-item');
+      const offset = -currentSlide * 100;
+      const carouselInner = document.querySelector('.carousel-inner');
+      carouselInner.style.transform = `translateX(${offset}%)`;
+    }
+
+    // Show the notification after 1 second
+    setTimeout(function () {
+      document.getElementById('notification').style.display = 'block';
+    }, 1000);
+
+    // Hide the notification after 6 seconds
+    setTimeout(function () {
+      document.getElementById('notification').style.display = 'none';
+    }, 6000);
+
+    // Close notification manually
+    function closeNotification() {
+      document.getElementById('notification').style.display = 'none';
+    }
+
+    // Show the modal on page load
+    window.onload = function () {
+      document.getElementById('welcomeModal').style.display = 'flex';
+    };
+
+    // Close modal
+    function closeModal() {
+      document.getElementById('welcomeModal').style.display = 'none';
+    }
+
+    // Auto slide transition every 3 seconds
+    setInterval(nextSlide, 3000);
+  </script>
+</body>
+
+</html>

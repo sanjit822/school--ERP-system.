@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About Us - University ERP</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding-top: 20px;
+    }
+    nav {
+      background-color: #333;
+      padding: 10px 20px;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-size: 16px;
+    }
+    .about-container {
+      max-width: 1100px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      text-align: center;
+    }
+    .header h1 {
+      color: #007bff;
+      font-size: 36px;
+    }
+    .header p {
+      font-size: 18px;
+      color: #555;
+    }
+    h2 {
+      color: #007bff;
+      text-align: center;
+      margin: 40px 0 20px;
+    }
+
+    /* Team Section */
+    .team-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .team-member {
+      width: 250px;
+      padding: 20px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      text-align: center;
+      transition: transform 0.3s;
+    }
+    .team-member:hover {
+      transform: scale(1.05);
+    }
+    .team-member img {
+      width: 100%;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+
+    /* Testimonials */
+    .testimonials-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .testimonial {
+      width: 300px;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      font-style: italic;
+    }
+    .testimonial span {
+      display: block;
+      text-align: right;
+      font-weight: bold;
+      color: #007bff;
+      margin-top: 10px;
+    }
+
+    /* Mission */
+    .mission-section p {
+      text-align: center;
+      color: #555;
+      font-size: 18px;
+    }
+
+    /* Gallery */
+    .image-gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .gallery-image {
+      width: 32%;
+      height: 200px;
+      background-size: cover;
+      background-position: center;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    /* Stats */
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 40px;
+      text-align: center;
+    }
+    .stat {
+      font-size: 24px;
+      color: #007bff;
+    }
+    .stat span {
+      display: block;
+      font-size: 40px;
+      font-weight: bold;
+    }
+
+    /* Scroll to top */
+    #scrollTopBtn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      display: none;
+    }
+
+    /* Modal */
+    #modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    #modal img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .gallery-image, .team-member {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('attendance') }}">Attendance</a>
+    <a href="{{ url_for('grades') }}">Grades</a>
+    <a href="{{ url_for('schedule') }}">Schedule</a>
+    <a href="{{ url_for('contact') }}">Contact</a>
+    <a href="{{ url_for('about') }}">About</a>
+  </nav>
+  
+
+  <div class="about-container">
+    <div class="header">
+      <h1>About Us</h1>
+      <p>Welcome to our University ERP system! Learn more about our team and what we do.</p>
+    </div>
+
+    <div class="mission-section">
+      <h2>Our Mission</h2>
+      <p>To provide a smart, streamlined ERP platform that empowers institutions and students to collaborate efficiently and transparently.</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><span id="students">0</span>+ Students</div>
+      <div class="stat"><span id="staff">0</span>+ Staff</div>
+      <div class="stat"><span id="departments">0</span> Departments</div>
+    </div>
+
+    <div class="team-section">
+      <h2>Our Team</h2>
+      <div class="team-container">
+        <div class="team-member">
+          <img src="static/images/image1.jpg" alt="John">
+          <h3>John Doe</h3>
+          <p>Project Manager</p>
+        </div>
+        <div class="team-member">
+          <img src="static/images/image2.jpg" alt="Jane">
+          <h3>Jane Smith</h3>
+          <p>Lead Developer</p>
+        </div>
+        <div class="team-member">
+          <img src="static/images/image3.jpg" alt="Emily">
+          <h3>Emily Johnson</h3>
+          <p>UI/UX Designer</p>
+        </div>
+        <div class="team-member">
+          <img src="static/images/image4.jpg" alt="Michael">
+          <h3>Michael Lee</h3>
+          <p>Database Architect</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonials-section">
+      <h2>What Our Users Say</h2>
+      <div class="testimonials-container">
+        <div class="testimonial">
+          <p>"This ERP system has made managing our university's resources much easier."</p>
+          <span>Mark T.</span>
+        </div>
+        <div class="testimonial">
+          <p>"The features are intuitive, and the system is very reliable."</p>
+          <span>Linda P.</span>
+        </div>
+        <div class="testimonial">
+          <p>"It’s great to track everything from a single dashboard!"</p>
+          <span>Robert W.</span>
+        </div>
+        <div class="testimonial">
+          <p>"I love the responsive design and fast performance."</p>
+          <span>Sophia G.</span>
+        </div>
+      </div>
+    </div>
+
+    <h2>Explore Our Campus</h2>
+    <div class="image-gallery">
+      <div class="gallery-image" style="background-image: url('static/images/campus1.jpg');" onclick="openModal('static/images/campus1.jpg')"></div>
+      <div class="gallery-image" style="background-image: url('static/images/campus2.jpg');" onclick="openModal('static/images/campus2.jpg')"></div>
+      <div class="gallery-image" style="background-image: url('static/images/campus3.jpg');" onclick="openModal('static/images/campus3.jpg')"></div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal" onclick="closeModal()">
+    <img id="modal-img" src="" alt="Full Image"/>
+  </div>
+
+  <button id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+
+  <script>
+    // Scroll-to-top button
+    const scrollTopBtn = document.getElementById("scrollTopBtn");
+    window.onscroll = () => {
+      scrollTopBtn.style.display = window.scrollY > 100 ? "block" : "none";
+    };
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // Modal Image Viewer
+    function openModal(src) {
+      document.getElementById("modal").style.display = "flex";
+      document.getElementById("modal-img").src = src;
+    }
+    function closeModal() {
+      document.getElementById("modal").style.display = "none";
+    }
+
+    // Animated Counters
+    function animateCounter(id, target) {
+      let count = 0;
+      const speed = target / 100;
+      const update = () => {
+        if (count < target) {
+          count += Math.ceil(speed);
+          document.getElementById(id).innerText = count;
+          setTimeout(update, 30);
+        } else {
+          document.getElementById(id).innerText = target;
+        }
+      };
+      update();
+    }
+
+    animateCounter("students", 1200);
+    animateCounter("staff", 150);
+    animateCounter("departments", 12);
+  </script>
+</body>
+</html>

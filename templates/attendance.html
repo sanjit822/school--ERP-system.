@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attendance - University ERP</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    nav {
+      background-color: #343a40;
+      color: white;
+      padding: 10px 0;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .dark-mode {
+      background-color: #222;
+      color: #ddd;
+    }
+
+    .search-container {
+      text-align: center;
+      margin: 20px;
+    }
+
+    .search-container input {
+      padding: 10px;
+      width: 60%;
+      font-size: 1em;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+
+    .attendance-table {
+      width: 90%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background-color: white;
+    }
+
+    .attendance-table th,
+    .attendance-table td {
+      padding: 10px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+
+    .attendance-table th {
+      background-color: #343a40;
+      color: white;
+    }
+
+    .attendance-table tr.low-attendance {
+      background-color: #ffe6e6;
+    }
+
+    .calendar-container {
+      margin: 20px;
+      text-align: center;
+    }
+
+    .calendar {
+      display: inline-block;
+      width: 300px;
+      border: 1px solid #ddd;
+      font-size: 1.2em;
+      padding: 10px;
+      background-color: #fff;
+    }
+
+    .calendar .month-year {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+    }
+
+    .calendar .days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .calendar .day {
+      padding: 10px;
+      background-color: #f4f4f4;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .calendar .day.today {
+      background-color: #ffd700;
+      font-weight: bold;
+    }
+
+    .footer {
+      background-color: #343a40;
+      color: white;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .container {
+      width: 90%;
+      margin: 0 auto;
+    }
+
+    .button-bar {
+      text-align: center;
+      margin: 20px;
+    }
+
+    .button-bar button {
+      padding: 10px 20px;
+      font-size: 1em;
+      margin: 0 10px;
+      cursor: pointer;
+      background-color: #343a40;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #28a745;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      display: none;
+      z-index: 999;
+    }
+
+    .gallery {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 30px 0;
+    }
+
+    .gallery img {
+      width: 30%;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s;
+    }
+
+    .gallery img:hover {
+      transform: scale(1.05);
+    }
+
+    .clock {
+      text-align: center;
+      font-size: 1.3em;
+      color: #343a40;
+      margin: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <nav>
+    <div class="container">
+      <a href="{{ url_for('index') }}">ERP System</a>
+      <a href="{{ url_for('login') }}">Login</a>
+      <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('attendance') }}">Attendance</a>
+      <a href="{{ url_for('grades') }}">Grades</a>
+      <a href="{{ url_for('schedule') }}">Schedule</a>
+      <a href="{{ url_for('notice') }}">Notice</a>
+      <a href="{{ url_for('messaging') }}">Messaging</a>
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('contact') }}">Contact</a>
+      <a href="{{ url_for('about') }}">About</a>
+    </div>
+  </nav>
+
+  <div class="clock" id="clockDisplay"></div>
+  <div style="text-align:center; font-weight:bold; margin-bottom: 10px;">
+    <span id="dateDisplay"></span> | <span id="dayDisplay"></span>
+  </div>
+
+  <div class="search-container">
+    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search for students or roll number..." />
+  </div>
+
+  <table class="attendance-table" id="attendanceTable">
+    <thead>
+      <tr>
+        <th>Student Name</th>
+        <th>Roll Number</th>
+        <th>Attendance Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>John Doe</td>
+        <td>12345</td>
+        <td>Present</td>
+        <td><button onclick="markAbsent(this)">Mark Absent</button></td>
+      </tr>
+      <tr>
+        <td>Jane Smith</td>
+        <td>12346</td>
+        <td>Absent</td>
+        <td><button onclick="markPresent(this)">Mark Present</button></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="button-bar">
+    <button onclick="downloadPDF()">Download as PDF</button>
+    <button onclick="downloadCSV()">Export CSV</button>
+    <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+  </div>
+
+  <div class="calendar-container">
+    <div class="calendar">
+      <div class="month-year">May 2025</div>
+      <div class="days" id="calendarDays"></div>
+    </div>
+  </div>
+
+  <div class="gallery">
+    <img src="static/images/image1.jpg" alt="Campus Image 1" />
+    <img src="static/images/image2.jpg" alt="Campus Image 2" />
+    <img src="static/images/image3.jpg" alt="Campus Image 3" />
+  </div>
+
+  <footer class="footer">
+    <p>&copy; 2025 University ERP System</p>
+  </footer>
+
+  <div class="toast" id="toast">Attendance Updated</div>
+
+  <script>
+    function searchTable() {
+      const input = document.getElementById("searchInput").value.toLowerCase();
+      const rows = document.querySelectorAll("#attendanceTable tbody tr");
+      rows.forEach(row => {
+        const name = row.cells[0].textContent.toLowerCase();
+        const roll = row.cells[1].textContent.toLowerCase();
+        row.style.display = (name.includes(input) || roll.includes(input)) ? "" : "none";
+      });
+    }
+
+    function markPresent(button) {
+      const row = button.closest("tr");
+      row.cells[2].textContent = "Present";
+      showToast("Marked Present");
+      button.style.display = "none";
+    }
+
+    function markAbsent(button) {
+      const row = button.closest("tr");
+      row.cells[2].textContent = "Absent";
+      showToast("Marked Absent");
+      button.style.display = "none";
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.style.display = "block";
+      setTimeout(() => { toast.style.display = "none"; }, 2000);
+    }
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById("clockDisplay").textContent = `Current Time: ${now.toLocaleTimeString()}`;
+      document.getElementById("dateDisplay").textContent = now.toLocaleDateString();
+      document.getElementById("dayDisplay").textContent = now.toLocaleDateString(undefined, { weekday: 'long' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function downloadPDF() {
+      window.print();
+    }
+
+    function downloadCSV() {
+      let csv = 'Name,Roll Number,Status\n';
+      const rows = document.querySelectorAll("#attendanceTable tbody tr");
+      rows.forEach(row => {
+        const cols = row.querySelectorAll("td");
+        csv += `${cols[0].textContent},${cols[1].textContent},${cols[2].textContent}\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "attendance.csv";
+      link.click();
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+    }
+
+    function generateCalendar() {
+      const daysContainer = document.getElementById("calendarDays");
+      const totalDays = 31;
+      const today = new Date().getDate();
+      for (let i = 1; i <= totalDays; i++) {
+        const day = document.createElement("div");
+        day.classList.add("day");
+        if (i === today) day.classList.add("today");
+        day.title = `Day ${i}`;
+        day.textContent = i;
+        daysContainer.appendChild(day);
+      }
+    }
+    generateCalendar();
+  </script>
+</body>
+
+</html>

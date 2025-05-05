@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Messaging - University ERP</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-image: url('static/images/background.jpg');
+      background-size: cover;
+      background-position: center;
+    }
+
+    nav {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #343a40;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      z-index: 2;
+    }
+
+    nav .container a {
+      margin: 0 10px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .messaging-container {
+      background-color: rgba(255, 255, 255, 0.95);
+      width: 85%;
+      max-width: 900px;
+      height: 90vh;
+      display: flex;
+      flex-direction: column;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .messaging-header {
+      background-color: #007bff;
+      color: white;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 10px 10px 0 0;
+    }
+
+    .messaging-header .user-info {
+      display: flex;
+      align-items: center;
+    }
+
+    .messaging-header img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .status-toggle {
+      cursor: pointer;
+      background-color: white;
+      color: #007bff;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+
+    .message-container {
+      flex-grow: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background-color: #f8f9fa;
+      border-bottom: 2px solid #ddd;
+    }
+
+    .message {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    .message.user {
+      justify-content: flex-end;
+    }
+
+    .message .text {
+      max-width: 65%;
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      border-radius: 10px;
+      margin-left: 10px;
+      position: relative;
+    }
+
+    .message.user .text {
+      background-color: #28a745;
+    }
+
+    .timestamp {
+      font-size: 10px;
+      color: #888;
+      margin-top: 3px;
+    }
+
+    .message-input {
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      border-top: 2px solid #ddd;
+      background-color: white;
+    }
+
+    .textarea-wrapper {
+      display: flex;
+      margin-bottom: 5px;
+    }
+
+    .message-input textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      resize: none;
+      font-size: 16px;
+      margin-right: 10px;
+    }
+
+    .send-btn,
+    .emoji-btn,
+    .attach-btn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px;
+      margin-left: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .send-btn:hover,
+    .emoji-btn:hover,
+    .attach-btn:hover {
+      background-color: #0056b3;
+    }
+
+    .typing-indicator {
+      font-style: italic;
+      font-size: 12px;
+      color: gray;
+    }
+
+    .image-section {
+      display: flex;
+      justify-content: space-around;
+      margin: 15px;
+    }
+
+    .image-section img {
+      width: 30%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    #scrollToTop {
+      position: absolute;
+      right: 20px;
+      bottom: 100px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      display: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <nav>
+    <div class="container">
+      <a href="{{ url_for('index') }}">ERP System</a>
+      <a href="{{ url_for('login') }}">Login</a>
+      <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('attendance') }}">Attendance</a>
+      <a href="{{ url_for('grades') }}">Grades</a>
+      <a href="{{ url_for('schedule') }}">Schedule</a>
+      <a href="{{ url_for('notice') }}">Notice</a>
+      <a href="{{ url_for('messaging') }}">Messaging</a>
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('contact') }}">Contact</a>
+      <a href="{{ url_for('about') }}">About</a>
+    </div>
+  </nav>
+
+  <div class="messaging-container">
+    <div class="messaging-header">
+      <div class="user-info">
+        <img src="static/images/user-avatar.jpg" alt="User Avatar">
+        <span>John Doe</span>
+      </div>
+      <button class="status-toggle" onclick="toggleStatus(this)">Online</button>
+    </div>
+
+    <div class="message-container" id="message-container">
+      <div class="message">
+        <div class="text">Hello! How can I assist you today?
+          <div class="timestamp">10:00 AM</div>
+        </div>
+      </div>
+      <div class="message user">
+        <div class="text">I need help with my grades.
+          <div class="timestamp">10:02 AM</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="message-input">
+      <div class="textarea-wrapper">
+        <textarea id="message-input" rows="2" placeholder="Type your message..." oninput="showTyping()"></textarea>
+        <button class="emoji-btn" onclick="addEmoji('😊')">😊</button>
+        <button class="attach-btn" onclick="addAttachment()">📎</button>
+        <button class="send-btn" onclick="sendMessage()">Send</button>
+      </div>
+      <div class="typing-indicator" id="typing-indicator"></div>
+    </div>
+
+    <div class="image-section">
+      <img src="static/images/image1.jpg" alt="Image 1" />
+      <img src="static/images/image2.jpg" alt="Image 2" />
+      <img src="static/images/image3.jpg" alt="Image 3" />
+    </div>
+
+    <button id="scrollToTop" onclick="scrollToTop()">↑ Top</button>
+  </div>
+
+  <script>
+    function sendMessage() {
+      const inputField = document.getElementById('message-input');
+      const messageContainer = document.getElementById('message-container');
+      const messageText = inputField.value.trim();
+
+      if (messageText !== "") {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', 'user');
+
+        const textDiv = document.createElement('div');
+        textDiv.classList.add('text');
+        textDiv.textContent = messageText;
+
+        const time = document.createElement('div');
+        time.classList.add('timestamp');
+        time.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        textDiv.appendChild(time);
+        messageDiv.appendChild(textDiv);
+        messageContainer.appendChild(messageDiv);
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+        inputField.value = '';
+        document.getElementById('typing-indicator').textContent = '';
+      }
+    }
+
+    function addEmoji(emoji) {
+      const input = document.getElementById('message-input');
+      input.value += emoji;
+      input.focus();
+    }
+
+    function addAttachment() {
+      alert("Attachment feature coming soon!");
+    }
+
+    function showTyping() {
+      const typingIndicator = document.getElementById('typing-indicator');
+      typingIndicator.textContent = "Typing...";
+      setTimeout(() => {
+        typingIndicator.textContent = "";
+      }, 2000);
+    }
+
+    function toggleStatus(btn) {
+      if (btn.textContent === "Online") {
+        btn.textContent = "Offline";
+        btn.style.backgroundColor = "#dc3545";
+      } else {
+        btn.textContent = "Online";
+        btn.style.backgroundColor = "#28a745";
+      }
+    }
+
+    function scrollToTop() {
+      const container = document.getElementById('message-container');
+      container.scrollTop = 0;
+    }
+
+    const container = document.getElementById('message-container');
+    container.addEventListener("scroll", () => {
+      const scrollBtn = document.getElementById("scrollToTop");
+      if (container.scrollTop > 100) {
+        scrollBtn.style.display = "block";
+      } else {
+        scrollBtn.style.display = "none";
+      }
+    });
+
+    window.onload = () => {
+      container.scrollTop = container.scrollHeight;
+    };
+  </script>
+</body>
+
+</html>

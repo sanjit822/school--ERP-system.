@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Grades - University ERP</title>
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body.dark {
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+    }
+
+    nav {
+      background-color: #343a40;
+      color: white;
+      padding: 10px 0;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      padding: 20px;
+      margin: 20px;
+    }
+
+    .grades-summary, .chart-container {
+      background-color: #f8f9fa;
+      border-radius: 5px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+
+    body.dark .grades-summary,
+    body.dark .chart-container {
+      background-color: #2c2c2c;
+    }
+
+    .grades-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .grades-table th, .grades-table td {
+      padding: 15px;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+
+    .grades-table th {
+      background-color: #343a40;
+      color: white;
+      cursor: pointer;
+    }
+
+    .grades-table td {
+      background-color: #f8f9fa;
+    }
+
+    body.dark .grades-table td {
+      background-color: #333;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+
+    .controls input, .controls button {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .controls button {
+      background-color: #343a40;
+      color: white;
+      cursor: pointer;
+    }
+
+    .controls button:hover {
+      background-color: #495057;
+    }
+
+    .grades-images {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .grades-images img {
+      width: 32%;
+      border-radius: 5px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .dark-mode-toggle {
+      background-color: #222;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .grades-images img {
+        width: 100%;
+      }
+
+      .controls input {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="container">
+      <a href="#">ERP System</a>
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('attendance') }}">Attendance</a>
+      <a href="{{ url_for('grades') }}">Grades</a>
+      <a href="{{ url_for('schedule') }}">Schedule</a>
+      <a href="{{ url_for('contact') }}">Contact</a>
+      <a href="{{ url_for('about') }}">About</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="grades-summary">
+      <h3>Your Grades Summary</h3>
+      <p>Below is a summary of your grades for the current semester.</p>
+      <div><strong>GPA:</strong> 3.85</div>
+      <div><strong>Highest Grade:</strong> A+</div>
+      <div><strong>Lowest Grade:</strong> B</div>
+    </div>
+
+    <div class="controls">
+      <input type="text" id="searchInput" placeholder="Search Course...">
+      <button onclick="downloadPDF()">Download PDF</button>
+      <button onclick="window.print()">Print</button>
+      <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+    </div>
+
+    <table class="grades-table" id="gradesTable">
+      <thead>
+        <tr>
+          <th onclick="sortTable(0)">Course</th>
+          <th onclick="sortTable(1)">Grade</th>
+          <th onclick="sortTable(2)">Credits</th>
+          <th onclick="sortTable(3)">Semester</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Data Structures</td>
+          <td>A</td>
+          <td>4</td>
+          <td>Fall 2025</td>
+        </tr>
+        <tr>
+          <td>Algorithms</td>
+          <td>A+</td>
+          <td>3</td>
+          <td>Fall 2025</td>
+        </tr>
+        <tr>
+          <td>Mathematics I</td>
+          <td>B+</td>
+          <td>3</td>
+          <td>Fall 2025</td>
+        </tr>
+        <tr>
+          <td>Computer Networks</td>
+          <td>A</td>
+          <td>4</td>
+          <td>Fall 2025</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="chart-container">
+      <h3>Grade Trend</h3>
+      <canvas id="gradeChart"></canvas>
+    </div>
+
+    <div class="grades-images">
+      <img src="static/images/image1.jpg" alt="John">
+      <img src="static/images/image5.jpg" alt="John">
+      <img src="static/images/image4.jpg" alt="John">
+    </div>
+  </div>
+
+  <!-- Chart.js & jsPDF -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+  <script>
+    // Chart
+    const ctx = document.getElementById("gradeChart").getContext("2d");
+    const gradeChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Data Structures', 'Algorithms', 'Mathematics I', 'Computer Networks'],
+        datasets: [{
+          label: 'Grades (GPA Scale)',
+          data: [4, 4.5, 3.5, 4],
+          backgroundColor: 'rgba(75, 192, 192, 0.4)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 5
+          }
+        }
+      }
+    });
+
+    // Search filter
+    document.getElementById("searchInput").addEventListener("input", function () {
+      const filter = this.value.toUpperCase();
+      const trs = document.querySelectorAll("#gradesTable tbody tr");
+      trs.forEach(tr => {
+        const course = tr.children[0].textContent.toUpperCase();
+        tr.style.display = course.includes(filter) ? "" : "none";
+      });
+    });
+
+    // PDF Export
+    async function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text("Grade Report", 10, 10);
+      const rows = Array.from(document.querySelectorAll("#gradesTable tbody tr")).map(tr =>
+        Array.from(tr.querySelectorAll("td")).map(td => td.innerText)
+      );
+      doc.autoTable({ head: [["Course", "Grade", "Credits", "Semester"]], body: rows });
+      doc.save("grades_report.pdf");
+    }
+
+    // Table sorting
+    function sortTable(colIndex) {
+      const table = document.getElementById("gradesTable");
+      const rows = Array.from(table.rows).slice(1);
+      const sorted = rows.sort((a, b) => {
+        return a.cells[colIndex].innerText.localeCompare(b.cells[colIndex].innerText);
+      });
+      sorted.forEach(row => table.appendChild(row));
+    }
+
+    // Dark Mode Toggle
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+    }
+  </script>
+</body>
+</html>

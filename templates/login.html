@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - University ERP</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      transition: background-color 0.3s ease;
+      background-image: url('static/images/background1.jpg');
+      background-size: cover;
+      background-position: center;
+    }
+
+    nav {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px 0;
+    }
+
+    nav .container {
+      max-width: 1000px;
+      margin: auto;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    nav a:hover,
+    nav a.active {
+      color: #ffd700;
+    }
+
+    .login-container {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      width: 400px;
+      text-align: center;
+      margin-top: 80px;
+      position: relative;
+    }
+
+    .login-container h2 {
+      margin-bottom: 20px;
+      color: #343a40;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 25px;
+      text-align: left;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    .input-group label {
+      position: absolute;
+      left: 10px;
+      top: 12px;
+      color: #888;
+      transition: 0.2s;
+      pointer-events: none;
+    }
+
+    .input-group input:focus + label,
+    .input-group input:not(:placeholder-shown) + label {
+      top: -10px;
+      left: 5px;
+      font-size: 12px;
+      background: white;
+      padding: 0 4px;
+      color: #007bff;
+    }
+
+    .input-group .tooltip {
+      font-size: 12px;
+      color: gray;
+      margin-top: 5px;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #007bff;
+    }
+
+    .password-strength {
+      margin-top: 5px;
+      font-size: 14px;
+      color: #888;
+    }
+
+    .login-btn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 18px;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .login-btn:hover {
+      background-color: #0056b3;
+    }
+
+    .forgot-password {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .forgot-password:hover {
+      text-decoration: underline;
+    }
+
+    .dark-mode-btn {
+      margin-top: 15px;
+      padding: 6px 14px;
+      font-size: 14px;
+      border: none;
+      background-color: #343a40;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .dark-mode {
+      background-color: #121212;
+      color: #eee;
+    }
+
+    .dark-mode .login-container {
+      background-color: rgba(33, 33, 33, 0.95);
+      color: white;
+    }
+
+    .image-section {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .image-section img {
+      width: 30%;
+      border-radius: 5px;
+      height: 80px;
+      object-fit: cover;
+    }
+
+    @media(max-width: 500px) {
+      .login-container {
+        width: 90%;
+        padding: 20px;
+      }
+
+      .image-section {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .image-section img {
+        width: 100%;
+      }
+    }
+
+    .loading-spinner {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #007bff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+
+<body>
+  <nav>
+    <div class="container">
+      <a href="{{ url_for('index') }}">Home</a>
+      <a class="active" href="{{ url_for('login') }}">Login</a>
+      <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('attendance') }}">Attendance</a>
+      <a href="{{ url_for('grades') }}">Grades</a>
+      <a href="{{ url_for('schedule') }}">Schedule</a>
+      <a href="{{ url_for('notice') }}">Notice</a>
+      <a href="{{ url_for('messaging') }}">Messaging</a>
+      <a href="{{ url_for('contact') }}">Contact</a>
+      <a href="{{ url_for('about') }}">About</a>
+    </div>
+  </nav>
+
+  <div class="login-container">
+    <h2>Login to University ERP</h2>
+    <form id="login-form" onsubmit="return validateForm()">
+      <div class="input-group">
+        <input type="text" id="username" name="username" placeholder=" " required />
+        <label for="username">Username</label>
+        <div class="tooltip">Alphanumeric only</div>
+      </div>
+
+      <div class="input-group">
+        <input type="password" id="password" name="password" placeholder=" " required />
+        <label for="password">Password</label>
+        <span class="toggle-password" onclick="togglePassword()">Show</span>
+        <div id="password-strength" class="password-strength">Password Strength: Weak</div>
+      </div>
+
+      <button type="submit" class="login-btn">Login</button>
+      <a href="#" class="forgot-password">Forgot your password?</a>
+      <button type="button" class="dark-mode-btn" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+    </form>
+
+    <div class="loading-spinner" id="loading-spinner"></div>
+
+    <div class="image-section">
+      <img src="static/images/image1.jpg" alt="Image 1">
+      <img src="static/images/image2.jpg" alt="Image 2">
+      <img src="static/images/image3.jpg" alt="Image 3">
+    </div>
+  </div>
+
+  <script>
+    function validateForm() {
+      var username = document.getElementById('username').value.trim();
+      var password = document.getElementById('password').value.trim();
+      var usernamePattern = /^[a-zA-Z0-9]+$/;
+
+      if (!username || !password) {
+        alert("All fields are required!");
+        return false;
+      }
+
+      if (!usernamePattern.test(username)) {
+        alert("Username must be alphanumeric.");
+        return false;
+      }
+
+      document.getElementById('loading-spinner').style.display = 'block'; // Show spinner
+      setTimeout(() => {
+        alert('Login successful!');
+        document.getElementById('loading-spinner').style.display = 'none'; // Hide spinner
+      }, 2000);
+
+      return true;
+    }
+
+    function togglePassword() {
+      const passwordField = document.getElementById("password");
+      const toggleBtn = document.querySelector(".toggle-password");
+
+      if (passwordField.type === "password") {
+        passwordField.type = "text";
+        toggleBtn.textContent = "Hide";
+      } else {
+        passwordField.type = "password";
+        toggleBtn.textContent = "Show";
+      }
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+    }
+
+    window.onload = function () {
+      const backgrounds = [
+        'static/images/background1.jpg',
+        'static/images/background2.jpg',
+        'static/images/background3.jpg'
+      ];
+      document.body.style.backgroundImage = 'url(' + backgrounds[Math.floor(Math.random() * backgrounds.length)] + ')';
+    };
+
+    document.getElementById('password').addEventListener('input', function () {
+      const password = this.value;
+      let strength = "Weak";
+      const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+      if (password.length >= 8 && regex.test(password)) {
+        strength = "Strong";
+      } else if (password.length >= 6) {
+        strength = "Medium";
+      }
+      document.getElementById('password-strength').textContent = 'Password Strength: ' + strength;
+    });
+  </script>
+</body>
+</html>
